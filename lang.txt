@@ -1,0 +1,35 @@
+{
+  Eva EBNF grammar
+  Note: nested subs forbidden
+}
+
+program	= block ;
+block	= [ "const" id "=" ( expr | str ) { "," id "=" ( expr | str ) } ";" ]
+	  [ "var" id [ arr ] [ ":" typ ] { "," id  [ arr ] [ ":" typ ] } ";" ]
+	  { "extern" id ";" }
+	  { "sub" id "(" [ vlist ] ")" [ ":" typ ] "is" block "end" "sub" ";" }
+	  stmt { stmt } ;
+stmt	= { Empty stmt } ";"
+	| id [ arr ] ":=" expr ";"
+	| [ id [ arr ] ":=" ] "call" id "(" clist ")" ";"
+	| "if" cnd "then" stmt { stmt } [ "else" stmt { stmt } ] "end" "if" ";"
+	| "while" cnd "do" stmt { stmt } "end" "while" ";"
+	| "goto" number ";"
+        | number ":" stmt
+	;
+cnd	= expr [ comp expr ] ;
+expr	= [ "+" | "-" ] term { ( "+" | "-" ) term } ;
+term	= factor { ( "*" | "/" ) factor } ;
+factor	= id [ arr ]
+	| number
+	| "(" expr ")"
+	;
+vlist	= id [ "[" "]" ] ":" typ { "," id [ "[" "]" ] ":" typ } ;
+clist	= { expr { "," expr } } ;
+typ	= ( "integer" | "string" ) ;
+comp	= "=" | "#" | "<" | ">" ;
+arr	= "[" expr "]" ;
+id	= alpha { ( alpha | digit ) } ;
+number	= digit { digit } ;
+alpha	= A-Za-z_ ;
+digit	= 0-9 ;
